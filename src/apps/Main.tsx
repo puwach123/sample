@@ -21,7 +21,18 @@ interface MainProps {
 }
 
 const useStyles = makeStyles((theme) => {
-  return {};
+  return {
+    box: { display: "flex" },
+    card: {
+      width: 300,
+      height: 300,
+      margin: theme.spacing(2),
+      display: "flex",
+      flexDirection: "column",
+      alignItems: "center",
+      justifyContent: "center",
+    },
+  };
 });
 
 function Main({ appinfos }: MainProps) {
@@ -35,26 +46,10 @@ function Main({ appinfos }: MainProps) {
       <Typography variant="subtitle1" align="center" gutterBottom>
         Implemented by Various Modern Web Frameworks
       </Typography>
-      <Box
-        style={{
-          display: "flex",
-        }}
-      >
+      <Box className={classes.box}>
         {appinfos.map((appinfo, index) => (
-          <Card
-            key={appinfo.name}
-            elevation={3}
-            style={{
-              width: 300,
-              height: 300,
-              margin: "16px",
-              display: "flex",
-              flexDirection: "column",
-              alignItems: "center",
-              justifyContent: "center",
-            }}
-          >
-            <CardContent style={{}}>
+          <Card key={appinfo.name} elevation={3} className={classes.card}>
+            <CardContent>
               <Typography variant="h4" align="center" gutterBottom>
                 {appinfo.name}
               </Typography>

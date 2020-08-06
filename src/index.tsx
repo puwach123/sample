@@ -5,6 +5,7 @@ import { createMuiTheme, ThemeProvider } from "@material-ui/core/styles";
 import blue from "@material-ui/core/colors/blue";
 
 import Main from "./apps/Main";
+import Counter from "./apps/counter/Counter";
 
 const theme = createMuiTheme({
   overrides: {},
@@ -24,7 +25,8 @@ const appinfos = [
 ReactDOM.render(
   <ThemeProvider theme={theme}>
     <CssBaseline />
-    <Main appinfos={appinfos} />
+    {/* <Main appinfos={appinfos} /> */}
+    <Counter />
   </ThemeProvider>,
   document.getElementById("root")
 );
