@@ -1,6 +1,5 @@
 import React from "react";
 
-import Content from "../components/layouts/Content";
 import {
   Box,
   Card,
@@ -11,14 +10,9 @@ import {
 } from "@material-ui/core";
 import { makeStyles } from "@material-ui/core/styles";
 
-type AppInfo = {
-  name: string;
-  summary: string;
-};
+import { Link as RouterLink } from "react-router-dom";
 
-interface MainProps {
-  appinfos: AppInfo[];
-}
+interface MainProps {}
 
 const useStyles = makeStyles((theme) => {
   return {
@@ -35,11 +29,16 @@ const useStyles = makeStyles((theme) => {
   };
 });
 
-function Main({ appinfos }: MainProps) {
+function Main(props: MainProps) {
   const classes = useStyles();
 
+  const appinfos = [
+    { name: "Counter", summary: "Simple Counter App" },
+    { name: "Todo", summary: "Simple Todo App" },
+  ];
+
   return (
-    <Content>
+    <>
       <Typography variant="h2" align="center" gutterBottom>
         Demo Web App
       </Typography>
@@ -58,14 +57,19 @@ function Main({ appinfos }: MainProps) {
               </Typography>
             </CardContent>
             <CardActions>
-              <Button variant="outlined" color="primary">
+              <Button
+                variant="outlined"
+                color="primary"
+                component={RouterLink}
+                to={("/" + appinfo.name).toLowerCase()}
+              >
                 VIEW
               </Button>
             </CardActions>
           </Card>
         ))}
       </Box>
-    </Content>
+    </>
   );
 }
 

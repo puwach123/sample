@@ -2,11 +2,11 @@ import React from "react";
 
 import Box from "@material-ui/core/Box";
 
-interface ContentProps {
+interface PageProps {
   children?: React.ReactNode;
 }
 
-function Content(props: ContentProps) {
+function Page(props: PageProps) {
   return (
     <Box style={{ width: "95vw", height: "95vh", margin: "2.5vh auto" }}>
       {props.children}
@@ -14,4 +14,4 @@ function Content(props: ContentProps) {
   );
 }
 
-export default Content;
+export default Page;

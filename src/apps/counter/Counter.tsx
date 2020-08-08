@@ -1,6 +1,5 @@
-import React, { useState, useRef } from "react";
+import React, { useRef } from "react";
 
-import Content from "../../components/layouts/Content";
 import { Typography, Grid, Button } from "@material-ui/core";
 import { makeStyles } from "@material-ui/core/styles";
 
@@ -17,6 +16,7 @@ const useStyles = makeStyles((theme) => {
   };
 });
 
+/*  Redux Begin */
 interface CounterAction {
   type: string;
   payload: number;
@@ -46,6 +46,7 @@ const rootStore = configureStore({
   devTools: process.env.NODE_ENV !== "production",
 });
 type RootDispatch = typeof rootStore.dispatch;
+/*  Redux End */
 
 function Counter() {
   const classes = useStyles();
@@ -64,7 +65,7 @@ function Counter() {
   };
 
   return (
-    <Content>
+    <>
       <Typography variant="h2" align="center" gutterBottom>
         Conuter
       </Typography>
@@ -127,7 +128,7 @@ function Counter() {
           </Button>
         </Grid>
       </Grid>
-    </Content>
+    </>
   );
 }
 
