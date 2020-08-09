@@ -12,8 +12,13 @@ import {
   ListItemSecondaryAction,
   IconButton,
   Button,
+  Box,
+  Tooltip,
+  Popover,
 } from "@material-ui/core";
 import DeleteIcon from "@material-ui/icons/Delete";
+import FilterListIcon from "@material-ui/icons/FilterList";
+import SearchIcon from "@material-ui/icons/Search";
 import { makeStyles } from "@material-ui/core/styles";
 
 import { Provider, useSelector, useDispatch } from "react-redux";
@@ -22,6 +27,7 @@ import {
   combineReducers,
   configureStore,
   PayloadAction,
+  createSelector,
 } from "@reduxjs/toolkit";
 import reduxLogger from "redux-logger";
 
@@ -47,6 +53,10 @@ const useStyles = makeStyles((theme) => {
         background: "rgba(0,0,0,0.15)",
       },
     },
+    paper: {
+      minWidth: 200,
+      padding: 8,
+    },
   };
 });
 
@@ -62,6 +72,7 @@ const todos: Array<Todo> = [
   { id: 1, item: "Build Login Form", status: "Done" },
   { id: 2, item: "Learn Next App", status: "NotDone" },
 ];
+
 /* Data Model End */
 
 /*  Redux Begin */
@@ -74,7 +85,10 @@ interface AddTodoPayload {
 let nextTodoID = todos.length;
 const todoSilce = createSlice({
   name: "todoapp",
-  initialState: { todos: todos },
+  initialState: { todos: todos, filter: "All" } as {
+    todos: Array<Todo>;
+    filter: string;
+  },
   reducers: {
     delAll: (state) => {
       state.todos = [];
@@ -99,6 +113,9 @@ const todoSilce = createSlice({
         return { payload: { id: nextTodoID++, item: item } };
       },
     },
+    setFilter: (state, action: PayloadAction<string>) => {
+      state.filter = action.payload;
+    },
   },
 });
 
@@ -108,6 +125,7 @@ const {
   delByID,
   addTodo,
   toggleStatus,
+  setFilter,
 } = todoSilce.actions;
 
 const rootReducer = combineReducers({
@@ -123,11 +141,20 @@ const rootStore = configureStore({
 });
 type RootDispatch = typeof rootStore.dispatch;
 
+const todosSelector = (state: RootState) => state.todoapp.todos;
+const filterSelector = (state: RootState) => state.todoapp.filter;
+const filteredTodoSelector = createSelector(
+  todosSelector,
+  filterSelector,
+  (todos, filter) =>
+    filter === "All" ? todos : todos.filter((todo) => todo.status === filter)
+);
+
 /* Redux End */
 
 function TodoApp() {
   const classes = useStyles();
-  const todos = useSelector((state: RootState) => state.todoapp.todos);
+  const filtered = useSelector(filteredTodoSelector);
   const dispatch = useDispatch<RootDispatch>();
 
   const Row = (props: { children?: React.ReactNode }) => (
@@ -139,11 +166,79 @@ function TodoApp() {
     </Grid>
   );
 
+  const FilterOptionsPopover = () => {
+    const classes = useStyles();
+    const filter = useSelector(filterSelector);
+    const dispatch = useDispatch<RootDispatch>();
+    const [anchorEl, setAnchorEl] = useState<HTMLButtonElement | null>(null);
+
+    const open = Boolean(anchorEl);
+    const id = open ? "filter-options-popover" : undefined;
+
+    return (
+      <>
+        <Tooltip title="Filter Todos">
+          <IconButton
+            aria-describedby={id}
+            aria-label="filter todo"
+            onClick={(event: React.MouseEvent<HTMLButtonElement>) =>
+              setAnchorEl(event.currentTarget)
+            }
+          >
+            <FilterListIcon />
+          </IconButton>
+        </Tooltip>
+        <Popover
+          id={id}
+          open={open}
+          anchorEl={anchorEl}
+          onClose={() => setAnchorEl(null)}
+          anchorOrigin={{
+            vertical: "bottom",
+            horizontal: "right",
+          }}
+          transformOrigin={{
+            vertical: "top",
+            horizontal: "right",
+          }}
+          classes={{ paper: classes.paper }}
+        >
+          <Box display="flex">
+            <Typography variant="button" style={{ padding: 8 }}>
+              FILTERS
+            </Typography>
+            <Box flexGrow={1} />
+            <Button color="primary" onClick={() => dispatch(setFilter("All"))}>
+              RESET
+            </Button>
+          </Box>
+          <Box>
+            <Typography variant="button" style={{ padding: 8 }}>
+              STATUS:
+            </Typography>
+            {["All", "Done", "NotDone"].map((status, index) => (
+              <Button
+                color={status === filter ? "primary" : "default"}
+                key={status}
+                onClick={() => dispatch(setFilter(status))}
+              >
+                {status}
+              </Button>
+            ))}
+          </Box>
+        </Popover>
+      </>
+    );
+  };
+
   return (
     <>
-      <Typography variant="h2" align="center" gutterBottom>
-        Todo App
-      </Typography>
+      <Row>
+        <Typography variant="h2" align="center" gutterBottom>
+          Todo App
+        </Typography>
+      </Row>
+
       <Row>
         <Typography variant="h3" display="inline" gutterBottom>
           Tasks
@@ -206,26 +301,38 @@ function TodoApp() {
         </Formik>
       </Row>
       <Row>
-        <Button
-          variant="outlined"
-          aria-label="delete-all"
-          style={{ marginRight: 8 }}
-          onClick={() => dispatch(delAll())}
-        >
-          CLEAR ALL
-        </Button>
-        <Button
-          variant="outlined"
-          aria-label="delete-completed"
-          style={{ marginRight: 8 }}
-          onClick={() => dispatch(delCompleted())}
-        >
-          CLEAR COMPLETED
-        </Button>
+        <Box display={"flex"}>
+          <Button
+            variant="outlined"
+            aria-label="delete-all"
+            size="small"
+            style={{ marginRight: 8 }}
+            onClick={() => dispatch(delAll())}
+          >
+            CLEAR ALL
+          </Button>
+          <Button
+            variant="outlined"
+            aria-label="delete-completed"
+            size="small"
+            style={{ marginRight: 8 }}
+            onClick={() => dispatch(delCompleted())}
+          >
+            CLEAR COMPLETED
+          </Button>
+          <Box flexGrow={1} />
+          <Tooltip title="Search">
+            <IconButton aria-label="search todo">
+              <SearchIcon />
+            </IconButton>
+          </Tooltip>
+
+          <FilterOptionsPopover />
+        </Box>
       </Row>
       <Row>
         <List>
-          {todos.map((todo, index) => (
+          {filtered.map((todo, index) => (
             <ListItem
               button
               key={todo.id}
@@ -238,13 +345,15 @@ function TodoApp() {
             >
               <ListItemText primary={todo.item} />
               <ListItemSecondaryAction>
-                <IconButton
-                  edge="end"
-                  aria-label="delete"
-                  onClick={() => dispatch(delByID(todo.id))}
-                >
-                  <DeleteIcon />
-                </IconButton>
+                <Tooltip title="Delete Todo">
+                  <IconButton
+                    edge="end"
+                    aria-label="delete"
+                    onClick={() => dispatch(delByID(todo.id))}
+                  >
+                    <DeleteIcon />
+                  </IconButton>
+                </Tooltip>
               </ListItemSecondaryAction>
             </ListItem>
           ))}
