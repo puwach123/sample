@@ -1,4 +1,4 @@
-import React from "react";
+import React, { Suspense, lazy } from "react";
 import ReactDOM from "react-dom";
 
 import { Button, CssBaseline } from "@material-ui/core";
@@ -13,10 +13,12 @@ import {
   Route,
 } from "react-router-dom";
 
-import Page from "./components/layouts/Page";
-import Counter from "./apps/counter/Counter";
-import TodoApp from "./apps/todo/TodoApp";
-import Main from "./apps/Main";
+import AuthApp from "./apps/auth/AuthApp";
+
+const Page = lazy(() => import("./components/layouts/Page"));
+const Main = lazy(() => import("./apps/Main"));
+const Counter = lazy(() => import("./apps/counter/Counter"));
+const TodoApp = lazy(() => import("./apps/todo/TodoApp"));
 
 const theme = createMuiTheme({
   overrides: {},
@@ -35,6 +37,23 @@ const routes = [
     main: () => (
       <Page>
         <Main />
+      </Page>
+    ),
+  },
+  {
+    path: "/auth",
+    exact: true,
+    main: () => (
+      <Page>
+        <Button
+          size="large"
+          startIcon={<ArrowBackIcon />}
+          component={RouterLink}
+          to={"/"}
+        >
+          Back
+        </Button>
+        <AuthApp />
       </Page>
     ),
   },
@@ -74,10 +93,9 @@ const routes = [
   },
 ];
 
-ReactDOM.render(
-  <ThemeProvider theme={theme}>
-    <CssBaseline />
-    <Router>
+const Index = () => (
+  <Router>
+    <Suspense fallback={<div></div>}>
       <Switch>
         {routes.map((route, index) => (
           <Route
@@ -88,7 +106,14 @@ ReactDOM.render(
           />
         ))}
       </Switch>
-    </Router>
+    </Suspense>
+  </Router>
+);
+
+ReactDOM.render(
+  <ThemeProvider theme={theme}>
+    <CssBaseline />
+    <AuthApp />
   </ThemeProvider>,
   document.getElementById("root")
 );

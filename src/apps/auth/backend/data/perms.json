@@ -1,0 +1,14 @@
+[
+  {
+    "id": 0,
+    "subject": "user",
+    "action": "post",
+    "object": "*"
+  },
+  {
+    "id": 1,
+    "subject": "user",
+    "action": "get",
+    "object": "*"
+  }
+]

@@ -35,6 +35,7 @@ function Main(props: MainProps) {
   const appinfos = [
     { name: "Counter", summary: "Simple Counter App" },
     { name: "Todo", summary: "Simple Todo App" },
+    { name: "Auth", summary: "Simple Auth App" },
   ];
 
   return (

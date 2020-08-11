@@ -238,7 +238,6 @@ function TodoApp() {
           Todo App
         </Typography>
       </Row>
-
       <Row>
         <Typography variant="h3" display="inline" gutterBottom>
           Tasks
